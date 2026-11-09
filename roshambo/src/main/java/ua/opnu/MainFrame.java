@@ -21,9 +21,11 @@ public class MainFrame extends JFrame implements ActionListener {
         JButton rockButton = new JButton("Камінь");
         rockButton.addActionListener(this);
         rockButton.setActionCommand("rock");
+
         JButton paperButton = new JButton("Папір");
         paperButton.addActionListener(this);
         paperButton.setActionCommand("paper");
+
         JButton scissorsButton = new JButton("Ножиці");
         scissorsButton.addActionListener(this);
         scissorsButton.setActionCommand("scissors");
@@ -37,53 +39,68 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private GameShape generateShape() {
-
-        // TODO: написати логіку методу
-
-        // Метод повертає об'єкт ігрової фігури (камінь, ножиці чи папір)
-        // випадковим чином
-
+        // Випадковим чином повертаємо один з трьох об'єктів
         int random = new Random().nextInt(3);
-
-        return new GameShape(); // TODO: змініть на об'єкт потрібної фігури
+        if (random == 0) {
+            return new Rock();
+        } else if (random == 1) {
+            return new Paper();
+        } else {
+            return new Scissors();
+        }
     }
 
     private int checkWinner(GameShape player, GameShape computer) {
+        // Якщо класи однакові — нічия
+        if (player.getClass() == computer.getClass()) {
+            return 0;
+        }
 
-        // Метод отримує клас фігури гравця і комп'ютера за допомогою оператора instanceof
-        // Метод повертає 1 якщо переміг гравець
-        // Метод повертає 0 якщо нічия (обидві фігури однакові)
-        // Метод повертає -1 якщо переміг комп'ютер
+        // Логіка: Камінь(Rock) б'є Ножиці(Scissors)
+        if (player instanceof Rock) {
+            if (computer instanceof Scissors) return 1; // Гравець виграв
+            if (computer instanceof Paper) return -1;   // Комп'ютер виграв
+        }
 
-        // TODO: написати логіку методу
+        // Логіка: Папір(Paper) б'є Камінь(Rock)
+        if (player instanceof Paper) {
+            if (computer instanceof Rock) return 1;
+            if (computer instanceof Scissors) return -1;
+        }
 
-        return 0;
+        // Логіка: Ножиці(Scissors) б'ють Папір(Paper)
+        if (player instanceof Scissors) {
+            if (computer instanceof Paper) return 1;
+            if (computer instanceof Rock) return -1;
+        }
+
+        return 0; // На випадок непередбачених помилок (хоча вони тут неможливі)
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Генерується ход комп'ютеру
         GameShape computerShape = generateShape();
+        GameShape playerShape = null;
 
-        GameShape playerShape = new GameShape();
-        // Визначаємо, на яку кнопку натиснув гравець
+        // Визначаємо фігуру гравця
         switch (e.getActionCommand()) {
             case "rock":
-                // присвоїти playerShape об'єкт відповідного класу
+                playerShape = new Rock();
                 break;
             case "paper":
-                // присвоїти playerShape об'єкт відповідного класу
+                playerShape = new Paper();
                 break;
             case "scissors":
-                // присвоїти playerShape об'єкт відповідного класу
+                playerShape = new Scissors();
                 break;
         }
 
-        // Визначити результат гри
+        // Захист від null (необов'язково, але є гарною практикою)
+        if (playerShape == null) return;
+
         int gameResult = checkWinner(playerShape, computerShape);
 
-        // Сформувати повідомлення
-        String message = "Player shape: " + playerShape + ". Computer shape: " + computerShape + ". ";
+        String message = "Player shape: " + playerShape + ". Computer shape: " + computerShape + ".\n";
         switch (gameResult) {
             case -1:
                 message += "Computer has won!";
@@ -95,7 +112,6 @@ public class MainFrame extends JFrame implements ActionListener {
                 message += "Player has won!";
         }
 
-        // Вивести діалогове вікно з повідомленням
         JOptionPane.showMessageDialog(null, message);
     }
 }
